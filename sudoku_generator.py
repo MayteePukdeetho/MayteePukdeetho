@@ -1,6 +1,7 @@
 import random
 import math
 
+
 """
 This was adapted from a GeeksforGeeks article "Program for Sudoku Generator" by Aarti_Rathi and Ankur Trisal
 https://www.geeksforgeeks.org/program-sudoku-generator/
@@ -54,6 +55,7 @@ class SudokuGenerator:
 	Parameters: None
 	Return: None
     '''
+
     def print_board(self):
         for row in self.board:
             print(" ".join(map(str, row)))
