@@ -137,6 +137,55 @@ def reset_finalized_cells(given_board, list_of_finalized_cells, list_of_erasable
     list_of_finalized_cells.clear()
     return list_of_finalized_cells, list_of_erasable_cells
 
+#cheats
+def cheat(given_board, solved_board,list_of_finalized_cells, list_of_erasable_cells):
+    #go through each cell and make it so it matches the correct solution, and adding it to
+    #the finalized cell list, except for the bottom right cell. Useful for testing.
+    for row in range(0,9):
+        for col in range(0,9):
+            if given_board.board[row][col] == 0:
+                given_board.board[row][col] = solved_board.board[row][col]
+                list_of_finalized_cells.append((row,col))
+                list_of_erasable_cells.remove((row,col))
+    given_board.board[8][8] = 0
+    list_of_finalized_cells.pop()
+    list_of_erasable_cells.append((8,8))
+    print(f"The final number is: {solved_board.board[8][8]}")
+    return given_board, list_of_finalized_cells, list_of_erasable_cells
+
+#erases_a_cell
+def erases_cell(given_board, list_of_erasable_cells):
+    selected_row, selected_col = select_a_row_and_column(given_board)
+    # checks if the cell is in the erasable cell list.
+    if (selected_row, selected_col) not in list_of_erasable_cells:
+        # it's not.
+        print("Invalid cell selection!")
+        return 0
+    else:
+        # it is. Maybe I should prompt user for if they're sure.
+        choice = int(input(f"Are you sure you want to erase cell in row:{selected_row} col:{selected_col}? [1 for yes] "))
+        if choice == 1:
+            given_board.board[selected_row][selected_col] = 0
+            print("Cell erased successfully!")
+        return 0
+
+#finalizes a cell
+def finalize_cell(given_board, list_of_finalized_cells, list_of_erasable_cells):
+    #finalizes a cell, making it being unable to erased, but making it be able to submit for grading
+    selected_row, selected_col = select_a_row_and_column(given_board)
+    #make sure it's valid.
+    if (selected_row, selected_col) not in list_of_erasable_cells or given_board.board[selected_row][selected_col] == 0:
+        print("Invalid cell selection!")
+        return 0
+    else:
+        choice = int(input("Are you sure you want to finalize this cell? [1 for yes] "))
+        if choice == 1:
+            #Finalizes the cell.
+            list_of_finalized_cells.append((selected_row,selected_col))
+            list_of_erasable_cells.remove((selected_row,selected_col))
+            print("Cell finalized successfully!")
+            return list_of_finalized_cells, list_of_erasable_cells
+
 def Sudoku_Game(given_board, solved_board):
     #for the reset function
     resetted_board = copy.deepcopy(given_board.get_board())
@@ -170,67 +219,23 @@ def Sudoku_Game(given_board, solved_board):
             return game_over(-1)
         #for testing purposes only
         if selection == 5:
-            #go through each cell and make it so it matches the correct solution, and adding it to
-            #the finalized cell list, except for the bottom right cell. Useful for testing.
-            for row in range(0,9):
-                for col in range(0,9):
-                    if given_board.board[row][col] == 0:
-                        given_board.board[row][col] = solved_board.board[row][col]
-                        list_of_finalized_cells.append((row,col))
-                        list_of_erasable_cells.remove((row,col))
-            given_board.board[8][8] = 0
-            list_of_finalized_cells.pop()
-            list_of_erasable_cells.append((8,8))
-            print(f"The final number is: {solved_board.board[8][8]}")
+            cheat(given_board, solved_board, list_of_finalized_cells, list_of_erasable_cells)
             menu(given_board)
         #Erases a cell.
         if selection == 6:
-            selected_row, selected_col = select_a_row_and_column(given_board)
-            #checks if the cell is in the erasable cell list.
-            if (selected_row, selected_col) not in list_of_erasable_cells:
-                #it's not.
-                print("Invalid cell selection!")
-                menu(given_board)
-
-            else:
-                #it is. Maybe I should prompt user for if they're sure.
-                choice = int(input(f"Are you sure you want to erase cell in row:{selected_row} col:{selected_col}? [1 for yes]"))
-                if choice == 1:
-                    given_board.board[selected_row][selected_col] = 0
-                    print("Cell erased successfully!")
-                    menu(given_board)
-                else:
-                    menu(given_board)
+            erases_cell(given_board, list_of_erasable_cells)
+            menu(given_board)
         if selection == 7:
-            #finalizes a cell, making it being unable to erased, but making it be able to submit for grading
-            selected_row, selected_col = select_a_row_and_column(given_board)
-            #make sure it's valid.
-            if (selected_row, selected_col) not in list_of_erasable_cells or given_board.board[selected_row][selected_col] == 0:
-                print("Invalid cell selection!")
+            #finalizes a cell
+            finalize_cell(given_board, list_of_finalized_cells, list_of_erasable_cells)
+            #Check if the board is full.
+            if Board_Full(given_board,list_of_erasable_cells) == False:
                 menu(given_board)
+            if Board_Full(given_board,list_of_erasable_cells) == True and check_if_winner(given_board, solved_board) == True:
+                # Did you do it correctly?
+                return game_over(0)
             else:
-                choice = int(input("Are you sure you want to finalize this cell? [1 for yes] "))
-                if choice == 1:
-                    #Finalizes the cell.
-                    list_of_finalized_cells.append((selected_row,selected_col))
-                    list_of_erasable_cells.remove((selected_row,selected_col))
-                    print("Cell finalized successfully!")
-                    #Check if the board is full.
-                    Full = Board_Full(given_board, list_of_erasable_cells)
-                    if Full == False:
-                        menu(given_board)
-                    if Full == True:
-                        #Did you do it correctly?
-                        winner = check_if_winner(given_board, solved_board)
-                        if winner == True:
-
-                            return game_over(0)
-                        else:
-                            return game_over(1)
-                    #Boards not full.
-                    menu(given_board)
-                else:
-                    menu(given_board)
+                return game_over(1)
 
 
 #uh, main gameplay loop I guess. I forgot this was here.
