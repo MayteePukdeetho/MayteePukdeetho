@@ -3,18 +3,18 @@ import copy
 #used for creating another board
 def greeting_screen():
     print("Welcome to Sudoku!")
-    choice = int(input("Choose your difficulty. \n[1 for Easy], [2 for Medium], [3 for Hard] "))
+    choice = int(input("Choose your difficulty. \n[0 for Easy], [1 for Medium], [2 for Hard] "))
     return choice
 #given board is what we will compare to solved board so to compare between the two.
 def sudoku_setup(choice):
     print(choice)
-    if choice == 1:
+    if choice == 0:
         solved_board = SudokuGenerator(9,30)
         given_board = SudokuGenerator(9,30)
-    elif choice == 2:
+    elif choice == 1:
         solved_board = SudokuGenerator(9,40)
         given_board = SudokuGenerator(9,40)
-    elif choice == 3:
+    elif choice == 2:
         solved_board = SudokuGenerator(9,50)
         given_board = SudokuGenerator(9,50)
     solved_board.fill_values()
@@ -120,26 +120,17 @@ def Sudoku_Game(given_board, solved_board):
             #prompts the user to select a cell
             selected_row, selected_col = select_a_row_and_column(given_board)
             #invalid selection, send back to menu.
-            if given_board.board[selected_row][selected_col] != 0:
+            if given_board.board[selected_row][selected_col] != 0 and ((selected_row, selected_col) in (list_of_finalized_cells or list_of_unerasable_cells)):
                 print("The cell you selected is already filled!")
                 menu(given_board)
                 #valid selection, but a number is already there (not 0).
-                if (selected_row, selected_col) in list_of_erasable_cells:
-                    #asking are you sure?
-                    choice = int(input("This cell is able to be overwritten. Do you want to overwrite it? [1 for yes]"))
-                    #user confirms.
-                    if choice == 1:
-                        #asks what number the cell will be filled in with.
-                        selected_num = int(input("What number do you want to fill the cell in with? [0 to cancel selection] "))
-                        #user cancels the selection.
-                        if selected_num == 0:
-                            #back to the menu!
-                            menu(given_board)
-                        #sketches in the number.
-                        given_board.board[selected_row][selected_col] = selected_num
-                #back to the menu.
-                menu(given_board)
-            #it's the same thing from above. theres probably a way to do this better. (sketch in function?)
+            if (selected_row, selected_col) in list_of_erasable_cells and given_board.board[selected_row][selected_col] != 0:
+                #asking are you sure?
+                choice = int(input("This cell is able to be overwritten. Do you want to overwrite it? [1 for yes]"))
+                #user cancels
+                if choice != 1:
+                    menu(given_board)
+            #(sketch in function?)
             selected_num = int(input("What number do you want to fill the cell in with? [0 to cancel selection] "))
             if selected_num == 0:
                 #he cancelled it.

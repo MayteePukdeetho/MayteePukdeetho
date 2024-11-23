@@ -12,7 +12,7 @@ game_state = "title"
 #checks if a certain box is clicked. Parameters are the x and y coordinateds of mouse click and
 #all boxes on screen. Maybe not the best implementation. returns the boxes index.
 def check_if_clicked(x,y,boxes):
-    print(x,y)
+    #print(x,y)
     for index, box in enumerate(boxes):
         box_coords = pygame.Rect(box)
         #after 2 hours of uh, not knowing this exists, it does.
@@ -21,6 +21,7 @@ def check_if_clicked(x,y,boxes):
             print(f"box using {box} at {index} was clicked.")
             return index
 
+#pro tip, theres a little > you can use to collapse the thingy.
 def draw_title_screen():
     #list of we want to be interactable with textboxes on the title screen.
     boxes = []
@@ -57,8 +58,21 @@ def draw_title_screen():
     screen.blit(textbox_easy_surface, textbox_easy_rect)
     screen.blit(textbox_medium_surface, textbox_medium_rect)
     screen.blit(textbox_hard_surface, textbox_hard_rect)
+    #this is what we will be checking with.
     return boxes
 
+"""CELL CLASS STARTS HERE"""
+class Cell:
+    #its our constructor.
+    def __init__(self, value, row, col, screen):
+        self.value = value
+        self.row = row
+        self.col = col
+        self.screen = screen
+
+    #its our setter (for the value, i assume we will be changing this like in GUI_LESS.).
+    def set_cell_value(self, value):
+        self.value = value
 
 
 
@@ -70,16 +84,21 @@ def draw_title_screen():
 
 def draw_main_screen(difficulty):
     screen.fill((200, 200, 200))
+
     if difficulty == 0:
+
         #loads an image as a surface
+        #PLACEHOLDER
         easy_img_surf = pygame.image.load("ez.jpg")
         easy_img_rect = easy_img_surf.get_rect(center = (360, 360))
         screen.blit(easy_img_surf, easy_img_rect)
     if difficulty == 1:
+        #PLACEHOLDER
         medium_img_surf = pygame.image.load("med.jpg")
         medium_img_rect = medium_img_surf.get_rect(center = (360, 360))
         screen.blit(medium_img_surf, medium_img_rect)
     if difficulty == 2:
+        #PLACEHOLDER
         hard_img_surf = pygame.image.load("hard.jpg")
         hard_img_rect = hard_img_surf.get_rect(center = (360, 360))
         screen.blit(hard_img_surf, hard_img_rect)
@@ -102,7 +121,6 @@ while True:
                 # the bottom right coordinates should be the  x + width, y + height
                 #comments are holdover from learning
                 # test = (pygame.Rect(textbox_easy_rect))
-                print(boxes)
                 difficulty = check_if_clicked(x, y, boxes)
                 if difficulty != None:
                     game_state = "main"
@@ -114,6 +132,11 @@ while True:
     if game_state == "title":
         boxes = draw_title_screen()
     if game_state == "main":
+        #setting up sudoku boards for the frontend
+        print(difficulty)
+        the_boards = sudoku_setup(difficulty)
+        given_board = the_boards[0]
+        solved_board = the_boards[1]
         draw_main_screen(difficulty)
 
     pygame.display.flip()
