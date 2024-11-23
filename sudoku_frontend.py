@@ -76,7 +76,7 @@ def draw_main_screen(difficulty):
         easy_img_rect = easy_img_surf.get_rect(center = (360, 360))
         screen.blit(easy_img_surf, easy_img_rect)
     if difficulty == 1:
-        medium_img_surf = pygame.image.load("medium.jpg")
+        medium_img_surf = pygame.image.load("med.jpg")
         medium_img_rect = medium_img_surf.get_rect(center = (360, 360))
         screen.blit(medium_img_surf, medium_img_rect)
     if difficulty == 2:
@@ -104,7 +104,8 @@ while True:
                 # test = (pygame.Rect(textbox_easy_rect))
                 print(boxes)
                 difficulty = check_if_clicked(x, y, boxes)
-                game_state = "main"
+                if difficulty != None:
+                    game_state = "main"
 
             #main logic
             if game_state == "main":
