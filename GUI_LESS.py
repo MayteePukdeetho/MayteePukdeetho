@@ -7,7 +7,6 @@ def greeting_screen():
     return choice
 #given board is what we will compare to solved board so to compare between the two.
 def sudoku_setup(choice):
-    print(choice)
     if choice == 0:
         solved_board = SudokuGenerator(9,30)
         given_board = SudokuGenerator(9,30)
@@ -99,7 +98,44 @@ def print_fancy_board(given_board, list_of_erasable_cells, list_of_unerasable_ce
                 print(given_board.board[row][col], end=" ")
     print("\n")
 
+#sketches a cell in
+def sketch_cell(given_board, list_of_erasable_cells, list_of_unerasable_cells, list_of_finalized_cells):
+#prompts the user to select a cell
+    selected_row, selected_col = select_a_row_and_column(given_board)
+    #invalid selection, send back to menu.
+    if given_board.board[selected_row][selected_col] != 0:
+        print(selected_row, selected_col, list_of_unerasable_cells)
+        if (selected_row, selected_col) in (list_of_finalized_cells or list_of_unerasable_cells):
+            print("The cell you selected is already filled!")
+            return 0
+        #valid selection, but a number is already there (not 0).
+    if (selected_row, selected_col) in list_of_erasable_cells and given_board.board[selected_row][selected_col] != 0:
+        #asking are you sure?
+        choice = int(input("This cell is able to be overwritten. Do you want to overwrite it? [1 for yes]"))
+        #user cancels
+        if choice != 1:
+            return 0
+    #(sketch in function?)
+    selected_num = int(input("What number do you want to fill the cell in with? [0 to cancel selection] "))
+    if selected_num == 0:
+        #he cancelled it.
+        return 0
+    #sketches in the number, again.
+    given_board.board[selected_row][selected_col] = selected_num
+    print("Cell sketched successfully!")
+    return 0
 
+#resets every finalized cell.
+def reset_finalized_cells(given_board, list_of_finalized_cells, list_of_erasable_cells):
+    #go through every finalized cell, and replace that with 0. then clear finalized cell list.
+    #also, since all of these cells can be erased now, add them to the erasable cells list.
+    for pair in list_of_finalized_cells:
+        row = pair[0]
+        col = pair[1]
+        given_board.board[row][col] = 0
+        list_of_erasable_cells.append((row,col))
+    list_of_finalized_cells.clear()
+    return list_of_finalized_cells, list_of_erasable_cells
 
 def Sudoku_Game(given_board, solved_board):
     #for the reset function
@@ -110,36 +146,15 @@ def Sudoku_Game(given_board, solved_board):
     list_of_finalized_cells = []
 
 
-#this is really messy i need to fix this
+##in progress of moving all functions to outside so it can be accessed by frontend.
     def menu(given_board):
         print("Choose your option:")
         #printing out the menu for the first time
         selection = int(input("1. Sketch in a cell \n2. Display the board \n3. Reset the board \n4. Exit\n5. Cheat (For Developers Only!)\n6. Erase a Cell.\n7. Finalize a Cell. "))
         #sketching in a cell, this...
         if selection == 1:
-            #prompts the user to select a cell
-            selected_row, selected_col = select_a_row_and_column(given_board)
-            #invalid selection, send back to menu.
-            if given_board.board[selected_row][selected_col] != 0 and ((selected_row, selected_col) in (list_of_finalized_cells or list_of_unerasable_cells)):
-                print("The cell you selected is already filled!")
-                menu(given_board)
-                #valid selection, but a number is already there (not 0).
-            if (selected_row, selected_col) in list_of_erasable_cells and given_board.board[selected_row][selected_col] != 0:
-                #asking are you sure?
-                choice = int(input("This cell is able to be overwritten. Do you want to overwrite it? [1 for yes]"))
-                #user cancels
-                if choice != 1:
-                    menu(given_board)
-            #(sketch in function?)
-            selected_num = int(input("What number do you want to fill the cell in with? [0 to cancel selection] "))
-            if selected_num == 0:
-                #he cancelled it.
-                menu(given_board)
-            #sketches in the number, again.
-            given_board.board[selected_row][selected_col] = selected_num
-            print("Cell sketched successfully!")
+            sketch_cell(given_board, list_of_erasable_cells, list_of_unerasable_cells, list_of_finalized_cells)
             menu(given_board)
-
         if selection == 2:
             #uses the lists from before to print out the board.
             print_fancy_board(given_board, list_of_erasable_cells, list_of_unerasable_cells, list_of_finalized_cells)
@@ -148,16 +163,8 @@ def Sudoku_Game(given_board, solved_board):
             #resets every finalized cell.
             are_you_sure= int(input("Are you sure? Input 1 to confirm."))
             if are_you_sure == 1:
-                #go through every finalized cell, and replace that with 0. then clear finalized cell list.
-                #also, since all of these cells can be erased now, add them to the erasable cells list.
-                for pair in list_of_finalized_cells:
-                    row = pair[0]
-                    col = pair[1]
-                    given_board.board[row][col] = 0
-                    list_of_erasable_cells.append((row,col))
-                list_of_finalized_cells.clear()
-
-                menu(given_board)
+                reset_finalized_cells(given_board, list_of_finalized_cells, list_of_erasable_cells)
+            menu(given_board)
         if selection == 4:
             #quits out the game.
             return game_over(-1)

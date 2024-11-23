@@ -61,18 +61,8 @@ def draw_title_screen():
     #this is what we will be checking with.
     return boxes
 
-"""CELL CLASS STARTS HERE"""
-class Cell:
-    #its our constructor.
-    def __init__(self, value, row, col, screen):
-        self.value = value
-        self.row = row
-        self.col = col
-        self.screen = screen
 
-    #its our setter (for the value, i assume we will be changing this like in GUI_LESS.).
-    def set_cell_value(self, value):
-        self.value = value
+
 
 
 
@@ -133,10 +123,11 @@ while True:
         boxes = draw_title_screen()
     if game_state == "main":
         #setting up sudoku boards for the frontend
-        print(difficulty)
         the_boards = sudoku_setup(difficulty)
         given_board = the_boards[0]
         solved_board = the_boards[1]
+        Sudoku_Game(given_board, solved_board)
+
         draw_main_screen(difficulty)
 
     pygame.display.flip()
