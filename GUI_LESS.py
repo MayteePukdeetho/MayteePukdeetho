@@ -195,7 +195,7 @@ def Sudoku_Game(given_board, solved_board):
     list_of_finalized_cells = []
 
 
-##in progress of moving all functions to outside so it can be accessed by frontend.
+
     def menu(given_board):
         print("Choose your option:")
         #printing out the menu for the first time
@@ -210,7 +210,7 @@ def Sudoku_Game(given_board, solved_board):
             menu(given_board)
         if selection == 3:
             #resets every finalized cell.
-            are_you_sure= int(input("Are you sure? Input 1 to confirm."))
+            are_you_sure= int(input("Are you sure? Input 1 to confirm. "))
             if are_you_sure == 1:
                 reset_finalized_cells(given_board, list_of_finalized_cells, list_of_erasable_cells)
             menu(given_board)

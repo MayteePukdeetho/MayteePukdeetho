@@ -2,13 +2,14 @@
 import pygame, sys
 from sudoku_generator import *
 from GUI_LESS import *
+from constans import *
 
 #setup pygame modules
 pygame.init()
-screen = pygame.display.set_mode((720, 720)) #creates a 720 by 720 screen
+screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT)) #creates a 720 by 720 screen
 pygame.display.set_caption("Sudoku") # the white bar ontop of the thingy says Sudoku now.
 game_state = "title"
-
+setup = 1
 #checks if a certain box is clicked. Parameters are the x and y coordinateds of mouse click and
 #all boxes on screen. Maybe not the best implementation. returns the boxes index.
 def check_if_clicked(x,y,boxes):
@@ -64,34 +65,29 @@ def draw_title_screen():
 
 
 
-
-
-
-
-
-
-
-
-def draw_main_screen(difficulty):
-    screen.fill((200, 200, 200))
-
-    if difficulty == 0:
-
-        #loads an image as a surface
-        #PLACEHOLDER
-        easy_img_surf = pygame.image.load("ez.jpg")
-        easy_img_rect = easy_img_surf.get_rect(center = (360, 360))
-        screen.blit(easy_img_surf, easy_img_rect)
-    if difficulty == 1:
-        #PLACEHOLDER
-        medium_img_surf = pygame.image.load("med.jpg")
-        medium_img_rect = medium_img_surf.get_rect(center = (360, 360))
-        screen.blit(medium_img_surf, medium_img_rect)
-    if difficulty == 2:
-        #PLACEHOLDER
-        hard_img_surf = pygame.image.load("hard.jpg")
-        hard_img_rect = hard_img_surf.get_rect(center = (360, 360))
-        screen.blit(hard_img_surf, hard_img_rect)
+def draw_main_screen():
+    screen.fill(MAIN_SCREEN_BG)
+    #lets draw the grid (10X10)
+    for num in range(1, 10):
+        #vertical lines
+        pygame.draw.line(screen,(0,0,0),(num*SCREEN_WIDTH/10,0),(num*SCREEN_WIDTH/10,720), 10)
+        #horizontal lines
+        pygame.draw.line(screen, (0, 0, 0), (0, num * SCREEN_HEIGHT / 10), (720, num * SCREEN_HEIGHT / 10), 10)
+    #fill the unused space with black boxes
+    pygame.draw.rect(screen, (0,0,0), (SIDE_BAR))
+    pygame.draw.rect(screen,(0,0,0),(BOTTOM_BAR))
+    #print the numbers
+    for row in range(0,9):
+        for col in range(0,9):
+            current_num = given_board.board[row][col]
+            #hide the 0 numbers
+            if current_num == 0:
+                current_num_surface = box_font.render(f"{current_num}", True, (MAIN_SCREEN_BG))
+            else:
+                current_num_surface = box_font.render(f"{current_num}", True, (60,70,100))
+            current_num_rect = current_num_surface.get_rect(topleft = ((row)*SCREEN_WIDTH/10+SCREEN_WIDTH/35,(col)*SCREEN_HEIGHT/10+SCREEN_HEIGHT/50))
+            #parse
+            screen.blit(current_num_surface, current_num_rect)
     pygame.display.flip()
 
 while True:
@@ -122,12 +118,17 @@ while True:
     if game_state == "title":
         boxes = draw_title_screen()
     if game_state == "main":
-        #setting up sudoku boards for the frontend
-        the_boards = sudoku_setup(difficulty)
-        given_board = the_boards[0]
-        solved_board = the_boards[1]
-        Sudoku_Game(given_board, solved_board)
+        if setup == 1:
+            #setting up sudoku boards for the frontend
+            the_boards = sudoku_setup(difficulty)
+            given_board = the_boards[0]
+            solved_board = the_boards[1]
+            solved_board.print_board()
+            print("AHHHHHHHHHHHHHHHHHH")
+            given_board.print_board()
+            draw_main_screen()
+            setup = 0
 
-        draw_main_screen(difficulty)
+
 
     pygame.display.flip()
